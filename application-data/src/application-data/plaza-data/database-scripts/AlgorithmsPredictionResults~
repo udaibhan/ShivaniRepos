@@ -1,0 +1,43 @@
+DELIMITER $$
+CREATE DEFINER=`kalpana`@`localhost` PROCEDURE `AlgorithmsPredictionResults`(IN PARAM_CORELATION_ID VARCHAR(45), IN PARAM_REF_TABLE_NAME VARCHAR(100))
+BEGIN
+
+INSERT INTO PREDICTION_RESULT
+	SELECT reference.EPC, reference.Shelf as SHELF,
+	IFNULL((SELECT PredictedShelf FROM CLOTHGROUPING_RESULT 
+as result where CORELATION_ID=PARAM_CORELATION_ID and result.EPC=reference.epc),'Not Predeicted') 
+as CG_PREDICTED_SHELF, 
+	IFNULL((SELECT PredictedShelf FROM J48_RESULT as result where
+ CORELATION_ID=PARAM_CORELATION_ID and result.EPC=reference.epc),'Not Predeicted') as J48_PREDICTED_SHELF, 
+	IFNULL((SELECT PredictedShelf FROM RANDOM_FOREST_BINARY_RESULT as result where
+ CORELATION_ID=PARAM_CORELATION_ID and result.EPC=reference.epc),'Not Predeicted') as RF_PREDICTED_SHELF,
+	IFNULL((SELECT PredictedShelf FROM VOTING_RESULT as result where 
+CORELATION_ID=PARAM_CORELATION_ID and result.EPC=reference.epc),'Not Predeicted') as VOTING_PREDICTED_SHELF,
+reference.SubQuadrant,
+IFNULL((SELECT PredictedSubQuadrant FROM CLOTHGROUPING_RESULT 
+as result where CORELATION_ID=PARAM_CORELATION_ID and result.EPC=reference.epc),'Not Predeicted') 
+as CG_PREDICTED_SubQuadrant,
+	IFNULL((SELECT PredictedSubQuadrant FROM J48_RESULT as result where
+ CORELATION_ID=PARAM_CORELATION_ID and result.EPC=reference.epc),'Not Predeicted') as J48_PREDICTED_SubQuadrant, 
+	IFNULL((SELECT PredictedSubQuadrant FROM RANDOM_FOREST_BINARY_RESULT as result where
+ CORELATION_ID=PARAM_CORELATION_ID and result.EPC=reference.epc),'Not Predeicted') as RF_PREDICTED_SubQuadrant,
+	IFNULL((SELECT PredictedSubQuadrant FROM VOTING_RESULT as result where 
+CORELATION_ID=PARAM_CORELATION_ID and result.EPC=reference.epc),'Not Predeicted') as VOTING_PREDICTED_SubQuadrant,
+reference.Quadrant,
+IFNULL((SELECT PredictedQuadrant FROM CLOTHGROUPING_RESULT 
+as result where CORELATION_ID=PARAM_CORELATION_ID and result.EPC=reference.epc),'Not Predeicted') 
+as CG_PREDICTED_Quadrant,
+	IFNULL((SELECT PredictedQuadrant FROM J48_RESULT as result where
+ CORELATION_ID=PARAM_CORELATION_ID and result.EPC=reference.epc),'Not Predeicted') as J48_PREDICTED_Quadrant, 
+	IFNULL((SELECT PredictedQuadrant FROM RANDOM_FOREST_BINARY_RESULT as result where
+ CORELATION_ID=PARAM_CORELATION_ID and result.EPC=reference.epc),'Not Predeicted') as RF_PREDICTED_Quadrant,
+	IFNULL((SELECT PredictedQuadrant FROM VOTING_RESULT as result where 
+CORELATION_ID=PARAM_CORELATION_ID and result.EPC=reference.epc),'Not Predeicted') 
+as VOTING_PREDICTED_Quadrant,PARAM_CORELATION_ID
+ FROM  REFERENCE_TABLE_PLAZA reference where reference.EPC 
+	in (select distinct epc from CLOTHGROUPING_RESULT 
+where CORELATION_ID=PARAM_CORELATION_ID);
+
+END$$
+DELIMITER ;
+
